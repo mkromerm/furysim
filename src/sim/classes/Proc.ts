@@ -61,8 +61,8 @@ export default class Proc extends EventEmitter {
 	this.stacks++
 	if(this.stacks > this.stacksMax) this.stacks = this.stacksMax
     this.log.count++
-	if(this.stacksMax < 2) {this.player.addTimeline(this.name, 'BUFF_APPLIED', `${this.buffDuration}s`)}
-	else {this.player.addTimeline(this.name, 'BUFF_APPLIED', `${this.stacks}s`)}
+	if(this.stacksMax > 1) {this.player.addTimeline(this.name, 'BUFF_APPLIED', `at ${this.stacks} stacks for ${this.buffDuration}s`)}
+	else {this.player.addTimeline(this.name, 'BUFF_APPLIED', `${this.buffDuration}s`)}
   }
 
   tryToProc() {
