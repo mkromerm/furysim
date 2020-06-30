@@ -18,7 +18,8 @@ export enum Result {
 export enum ProcType {
   ExtraAttack = 'extraAttack',
   AtkSpeed = 'atkSpeed',
-  Str = 'str'
+  Str = 'str',
+ Pen = 'pen'
 }
 
 export default class Weapon {
@@ -33,6 +34,7 @@ export default class Weapon {
   private result: Result | undefined
   private target: Target
   private wf: Windfury | undefined
+  private stats: any
   swingTimer: AttackSpeed
   enchant: Proc | undefined
 
@@ -183,6 +185,15 @@ export default class Weapon {
       }
 
       if (this._proc.type === 'str') {
+        return new Proc(
+          this.player,
+          `${this.name} Proc`,
+          this._proc.duration,
+          { chance: this._proc.chance },
+          this._proc
+        )
+      }
+	if (this._proc.type === 'pen') {
         return new Proc(
           this.player,
           `${this.name} Proc`,

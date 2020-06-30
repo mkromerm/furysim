@@ -16,6 +16,11 @@
           <label>Strength</label>
           <input type="number" required min="10" max="1000" v-model.number="formData.player.str">
         </div>
+		
+		<div class="horizontal">
+          <label>Agility</label>
+          <input type="number" required min="10" max="1000" v-model.number="formData.player.agi">
+        </div>
 
         <div class="horizontal">
           <label>Attack Power</label>
@@ -330,6 +335,13 @@
               <input type="number" min="0" max="100" v-model.number="formData.player.whirlwind.rage">
             </code>
           </div>
+		<div class="horizontal">
+            Whirlwind hits 
+            <code>targets =
+              <input type="number" min="1" max="4" v-model.number="formData.player.whirlwind.targets">
+            </code>
+			targets
+          </div>
           <div class="horizontal">
             If Bloodthirst
             <code>cooldown left &gt;=
@@ -383,6 +395,14 @@
           </label>
         </div>
         <div v-if="formData.player.heroicStrike.canUse" class="ident">
+				<div class="horizontal">
+            <div class="u-flex">
+            <label>
+              <input type="checkbox" v-model="formData.player.heroicStrike.cleave">
+              <span class="label-body">Assume 2 targets and replace with Cleave</span>
+            </label>
+          </div>
+          </div>
           <div class="horizontal">
             If
             <code>rage &gt;=
@@ -390,6 +410,7 @@
             </code>
           </div>
         </div>
+		
 
         <div class="u-flex">
           <label>
@@ -432,7 +453,7 @@
             <label>Crit</label>
             <span class="u-family-title">{{ playerStats.crit }}%</span>
           </div>
-          <small>* BoK is added during sim to account procs.</small>
+          <small>* Strength from ZG and BoK is added during sim to account procs.</small>
         </div>
 
         <h4>Simulation</h4>
@@ -521,8 +542,8 @@ export default {
     Weapon
   },
   data() {
-    const defaultMh = weaponsData['1H Axes'].find(w => w.title === 'Deathbringer')
-    const defaultOh = weaponsData['1H Axes'].find(w => w.title === 'Frostbite')
+    const defaultMh = weaponsData['1H Axes'].find(w => w.title === 'Crul\'shorukh, Edge of Chaos')
+    const defaultOh = weaponsData['Daggers'].find(w => w.title === 'Core Hound Tooth')
     const dwTalent = 'https://classic.wowhead.com/talent-calc/warrior/30305001302-05050005525010051'
     const isProd = process.env.NODE_ENV === 'production'
 
@@ -548,16 +569,17 @@ export default {
         },
         player: {
           lvl: 60,
-          str: 250,
-          ap: 910,
-          hit: 6,
+          str: 330,
+		agi: 185,
+          ap: 1014,
+          hit: 7,
           haste: 0,
-          crit: 20.45,
-          startRage: 0,
+          crit: 19.25,
+          startRage: 100,
           talents: dwTalent,
           buffs: [
             'ony', 'dm', 'sf', 'wcb', 'mark', 'bloodFury', 'strTotem', 'wf', 'jujuPower',
-            'roids', 'jujuMight', 'sunfruit', 'mrp', 'mongoose', 'eleStoneOh'
+            'roids', 'jujuMight', 'dumplings', 'mrp', 'mongoose', 'eleStoneOh', 'zg'
           ],
           mainhand: {
             canUse: true,
@@ -662,6 +684,8 @@ export default {
           { title: 'Fengus\' Ferocity (DM AP)', value: 'dm' },
           { title: 'Songflower Serenade', value: 'sf' },
           { title: 'Warchief\'s Blessing (WCB/Rend)', value: 'wcb' },
+	{ title: 'Spirit of Zandalar', value: 'zg' },
+	{ title: 'Sayge\'s Dark Fortune of Damage', value: 'dmf' },
           { title: 'Mark of the Wild', value: 'mark' },
           { title: 'Leader of the Pack', value: 'lotp' },
           { title: 'Trueshot Aura', value: 'trueshot' },
@@ -672,7 +696,7 @@ export default {
           },
           { title: '[H] Improved Windfury', value: 'improvedWf' },
           { title: '[A] Blessing of Might', value: 'bom' },
-          { title: '[A] Blessing of Kings *', value: 'bok' },
+		{ title: '[A] Blessing of Kings', value: 'bok' },
         ],
         consumables: [
           { title: 'Juju Power', value: 'jujuPower',
@@ -688,7 +712,7 @@ export default {
             disabled: this.formData.player.buffs.includes('jujuMight')
           },
           { title: 'R.O.I.D.S.', value: 'roids' },
-          { title: 'Blessed Sunfruit', value: 'sunfruit' },
+          { title: 'Smoked Sandworm Dumplings', value: 'dumplings' },
           { title: 'Mighty Rage Potion (MRP)', value: 'mrp' },
           { title: 'Elixir of the Mongoose', value: 'mongoose' },
           { title: 'Elem. Sharp. Stone MH', value: 'eleStoneMh',
@@ -711,6 +735,7 @@ export default {
     },
     playerStats() {
       let str = this.formData.player.str
+	let agi = this.formData.player.agi
       const lvl = this.formData.player.lvl
       const initBaseAp = Player.getBaseAp(lvl, str)
       const gearAp = this.formData.player.ap - initBaseAp
@@ -723,7 +748,7 @@ export default {
         if (value === 'jujuPower') str += 30
         if (value === 'giants') str += 25
         if (value === 'roids') str += 25
-        if (value === 'sunfruit') str += 10
+        if (value === 'dumplings') str += 20
       })
 
       let buffAp = 0
@@ -748,6 +773,8 @@ export default {
         if (value === 'mongoose') crit += 3.25
         if (value === 'eleStoneMh') crit += 2
         if (value === 'eleStoneOh') crit += 2
+		if (value === 'zg') crit += agi*.15/20
+		if (value === 'bok') crit += agi*.1/20
       })
       crit += this.talents.cruelty
       crit += 3 // Berserker Stance
@@ -860,7 +887,9 @@ export default {
             improvedWf: form.player.buffs.includes('improvedWf'),
             bok: form.player.buffs.includes('bok'),
             bloodFury: form.player.buffs.includes('bloodFury'),
-            mrp: form.player.buffs.includes('mrp')
+            mrp: form.player.buffs.includes('mrp'),
+			dmf: form.player.buffs.includes('dmf'),
+			zg: form.player.buffs.includes('zg')
           },
           hoj: form.player.hoj,
           mainhand: form.player.mainhand,

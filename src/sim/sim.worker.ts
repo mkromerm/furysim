@@ -11,6 +11,8 @@ const postMessageFix: any = postMessage
 
 function run(cfg: any) {
   let previousProgress
+  let min:any
+  let max:any
   const startTime = new Date().getTime()
   const player = new Player(cfg)
   const events = [
@@ -20,16 +22,20 @@ function run(cfg: any) {
     player.mainhand,
     player.offhand,
 
+
     player.deathWish,
-    player.bloodrage,
+	player.bloodrage,
     player.mrp,
-    player.battleShout,
+	player.bloodthirst,
+
+    //player.battleShout,
     player.cloudkeeper,
     player.diamondFlask,
-    player.bloodFury,
+	player.bloodFury,
+    
 
     player.execute,
-    player.bloodthirst,
+
     player.whirlwind,
     player.slam.cast,
     player.hamstring,
@@ -38,6 +44,8 @@ function run(cfg: any) {
     player.angerManagement,
     player.red
   ].filter(e => !!e)
+  max = 0
+  min = 500000
 
   for (let i = 0; i < cfg.iterations; i++) {
     player.logTimeline = i === cfg.iterations - 1
@@ -78,7 +86,8 @@ function run(cfg: any) {
 
       nextEvent.handle()
     }
-
+	//if(player.log.dps > max) max = player.log.dps
+	//if(player.log.dps < min) min = player.log.dps
     player.reset()
 
     const progress = m.round(i / cfg.iterations * 100)

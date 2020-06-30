@@ -3,13 +3,15 @@ import Skill from '@/sim/classes/Skill'
 
 export default class HeroicStrike extends Skill {
   private _isQueued: boolean
+  private _isCleave: boolean
   queue: HeroicStrikeQueue
 
   constructor(player: Player, cfg: any) {
-    const heroicCost = 15 - player.talents.impHS
-    super(player, 'Heroic Strike', heroicCost, 0, false, cfg)
+	const heroicCost = cfg.cleave ? 20 : 15
+    super(player, cfg.cleave ? 'Cleave' : 'Heroic Strike', heroicCost, 0, false, cfg)
 
     this._isQueued = false
+	this._isCleave = cfg.cleave
     this.queue = new HeroicStrikeQueue(this)
   }
 
@@ -20,7 +22,7 @@ export default class HeroicStrike extends Skill {
   }
 
   get dmg() {
-    return this.player.mainhand.dmg + 138
+    return this._isCleave ? (this.player.mainhand.dmg + 100) * 2 : this.player.mainhand.dmg + 100;
   }
 
   get canQueue() {

@@ -10,6 +10,8 @@ export default class Proc extends EventEmitter {
   private chance: number
   protected buffDurationLeft: number
   protected buffDuration: number
+  stacksMax: number
+  stacks: number
   type: ProcType
   amount: number
 
@@ -29,6 +31,8 @@ export default class Proc extends EventEmitter {
       : ppmOrChance.chance
     this.amount = cfg && cfg.amount
     this.type = cfg && cfg.type
+	this.stacksMax = cfg && cfg.stacks
+	this.stacks = 0
   }
 
   // Getters
@@ -47,14 +51,18 @@ export default class Proc extends EventEmitter {
 
     if (this.isActive) return
     this.emit('fade')
+	this.stacks = 0
     this.player.addTimeline(this.name, 'BUFF_FADED')
   }
 
   apply() {
     this.emit('proc', this.isActive)
     this.buffDurationLeft = this.buffDuration
+	this.stacks++
+	if(this.stacks > this.stacksMax) this.stacks = this.stacksMax
     this.log.count++
-    this.player.addTimeline(this.name, 'BUFF_APPLIED', `${this.buffDuration}s`)
+	if(this.stacksMax < 2) {this.player.addTimeline(this.name, 'BUFF_APPLIED', `${this.buffDuration}s`)}
+	else {this.player.addTimeline(this.name, 'BUFF_APPLIED', `${this.stacks}s`)}
   }
 
   tryToProc() {

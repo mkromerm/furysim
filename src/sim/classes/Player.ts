@@ -38,6 +38,8 @@ export default class Player {
   target: Target
   windfury: Windfury | undefined
   bok: boolean
+  zg: boolean
+  dmf: boolean
   mrp: MightyRagePotion | undefined
   bloodFury: BloodFury | undefined
   red: EssenceOfTheRed | undefined
@@ -81,6 +83,8 @@ export default class Player {
 
     this.windfury = cfg.player.buffs.wf && new Windfury(this, cfg.player.buffs.improvedWf)
     this.bok = cfg.player.buffs.bok
+	this.zg = cfg.player.buffs.zg
+	this.dmf = cfg.player.buffs.dmf
     this.mrp = cfg.player.buffs.mrp && new MightyRagePotion(this, cfg.player.mrp)
     this.bloodFury = cfg.player.buffs.bloodFury && new BloodFury(this, cfg.player.bloodFury)
     this.red = cfg.player.buffs.red && new EssenceOfTheRed(this)
@@ -122,7 +126,7 @@ export default class Player {
     let dmgMul = this._dmgMul
 
     if (this.deathWish && this.deathWish.isActive) dmgMul *= 1.2
-
+	if(this.dmf) dmgMul *= 1.1
     return dmgMul
   }
 
@@ -139,7 +143,8 @@ export default class Player {
 
     if (this.diamondFlask && this.diamondFlask.isActive) str += 75
     if (this.mrp && this.mrp.isActive) str += 60
-    if (this.bok) str *= 1.1
+    if (this.zg) str *= 1.15
+	if (this.bok) str *= 1.1
 
     return str
   }
@@ -156,7 +161,7 @@ export default class Player {
     let ap = baseAp + this.flatAp
 
     if (this.bloodFury && this.bloodFury.isActive) ap += this.bloodFury.apSnapshot
-    if (this.battleShout.isActive) ap += 193 * this.battleShoutApMul
+    ap += 193 * this.battleShoutApMul
     if (this.windfury && this.windfury.isActive) ap += this.windfury.ap
     if (this.cloudkeeper && this.cloudkeeper.isActive) ap += 100
 

@@ -62,6 +62,7 @@
           <option value="atkSpeed">Atk. Speed</option>
           <option value="extraAttack">Extra Attack</option>
           <option value="str">Strength</option>
+		<option value="pen">Armor Pen</option>
         </select>
       </div>
       <div v-if="value.proc.type" class="ident">
@@ -71,7 +72,7 @@
             v-model.number="value.proc.percent"
             type="number"
             min="0.01"
-            max="20"
+            max="100"
             step="0.01"
             required
             :disabled="!value.canUse">
@@ -82,7 +83,7 @@
             v-model.number="value.proc.amount"
             type="number"
             min="1"
-            max="500"
+            max="2000"
             required
             :disabled="!value.canUse">
         </div>
@@ -93,6 +94,16 @@
             type="number"
             min="1"
             max="300"
+            required
+            :disabled="!value.canUse">
+        </div>
+		<div v-if="value.proc.type == 'pen'" class="horizontal">
+          <label>Max Stacks</label>
+          <input
+            v-model.number="value.proc.stacks"
+            type="number"
+            min="1"
+            max="5"
             required
             :disabled="!value.canUse">
         </div>
@@ -176,7 +187,8 @@ export default {
          percent: value.proc && value.proc.percent ||
           value.proc && this.getPercent(value.proc.ppm, value.speed),
          amount: value.proc ? value.proc.amount : 0,
-         duration: value.proc ? value.proc.duration : 0
+         duration: value.proc ? value.proc.duration : 0,
+		stacks: value.proc ? value.proc.stacks : 0
       }
     }
   },

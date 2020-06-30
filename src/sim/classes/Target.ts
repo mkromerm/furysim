@@ -19,8 +19,12 @@ export default class Target {
 
   // https://vanilla-wow.fandom.com/wiki/Armor
   get armorMitigationMul() {
-    const value = 1 - (this.armor / (this.armor + 400 + 85 * this.player.lvl))
-    Object.defineProperty(this, 'armorMitigationMul', { value })
+	//calculate effective armor if pen proc is up
+	let eArmor = this.armor
+	if (this.player.mainhand.proc && this.player.mainhand.proc.type == 'pen' && this.player.mainhand.proc.isActive) eArmor = eArmor - this.player.mainhand.proc.amount * this.player.mainhand.proc.stacks
+	if (eArmor < 0) eArmor = 0
+    const value = 1 - (eArmor / (eArmor + 400 + 85 * this.player.lvl))
+    //Object.defineProperty(this, 'armorMitigationMul', { value })
     return value
   }
 }
